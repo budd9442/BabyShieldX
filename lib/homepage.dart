@@ -80,7 +80,6 @@ class _HomePageState extends State<HomePage> {
               borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(16), topRight: Radius.circular(16))),
           child: Container(
-
             child: Padding(
               padding: const EdgeInsets.all(20),
               child: Column(
@@ -122,7 +121,8 @@ class _HomePageState extends State<HomePage> {
                               ),
                             ],
                           ),
-                          const Column(
+                          const Flexible(
+                              child: Column(
                             children: [
                               SizedBox(
                                 width: 20,
@@ -156,7 +156,7 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               ]),
                             ],
-                          )
+                          )),
                         ],
                       ),
                     ),
@@ -176,19 +176,20 @@ class _HomePageState extends State<HomePage> {
                                 const Text(
                                   textAlign: TextAlign.center,
                                   'You can explore our full medical services through our official website. This app is helpful for getting an appointment with your doctor.',
-                                  style: TextStyle(fontSize: 13,)
-                                  ,
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                  ),
                                 ),
                                 SizedBox(height: 8),
-                                Padding(padding: EdgeInsets.only(left: 10),
-                                child:  ElevatedButton(
-                                  onPressed: () {
-                                    // Quick response action
-                                  },
-                                  child: Text('Quick response'),
+                                Padding(
+                                  padding: EdgeInsets.only(left: 10),
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      // Quick response action
+                                    },
+                                    child: Text('Quick response'),
+                                  ),
                                 ),
-                                ),
-
                               ],
                             ),
                           ),
@@ -201,31 +202,45 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   SizedBox(height: 32),
-                  Row(
-
+                  Flex(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    direction: Axis.horizontal,
                     children: [
-
-                      ElevatedButton.icon(
-                        onPressed: () {
-                          // Define the action you want to perform on button press
-                        },
-                        icon: Icon(Icons.search, color: Colors.white),
-                        // Search icon
-                        label: const Text(
-                           "     Vaccination details           ",
-                          style: TextStyle(
-                              color: Colors.white, fontSize: 18), // Text color
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFF52C6A9),
-                          // Custom button color
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            // Define the action you want to perform on button press
+                          },
+                          icon: Icon(Icons.search, color: Colors.white),
+                          // Search icon
+                          label: const Text(
+                            "Vaccination Details",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18), // Text color
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Color(0xFF52C6A9),
+                            // Custom button color
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                           ),
                         ),
-                      )
+                      ),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      FloatingActionButton(
+                        onPressed: () {
+                          // Add vaccination record
+                        },
+                        child: Icon(Icons.add_outlined),
+                        backgroundColor: Colors.teal,
+                        foregroundColor: Colors.white,
+                      ),
                     ],
                   ),
                 ],
@@ -234,15 +249,6 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Add vaccination record
-        },
-        child: Icon(Icons.add),
-        backgroundColor: Colors.teal,
-        foregroundColor: Colors.white,
-      ),
-
     );
   }
 }

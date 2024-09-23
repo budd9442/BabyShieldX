@@ -1,3 +1,4 @@
+import 'package:babyshieldx/calendar.dart';
 import 'package:babyshieldx/homepage.dart';
 import 'package:flutter/material.dart';
 
@@ -12,7 +13,7 @@ class TabBase extends StatelessWidget {
           body: TabBarView(
             children: [
               Container(child: HomePage()),
-              Container(child: Icon(Icons.directions_transit)),
+              Container(child: CalendarPage()),
               Container(child: Icon(Icons.directions_bike)),
               Container(child: Icon(Icons.directions_bike)),
             ],
