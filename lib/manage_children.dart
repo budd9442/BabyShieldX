@@ -1,8 +1,10 @@
 // Import the ChildDashboard screen
 import 'package:babyshieldx/child_dashboard.dart'; // Assuming you've saved the ChildDashboard as 'child_dashboard.dart'.
+import 'package:babyshieldx/models/child_provider.dart';
 
 import 'package:babyshieldx/models/models.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ManageChildrenPage extends StatefulWidget {
   @override
@@ -10,36 +12,12 @@ class ManageChildrenPage extends StatefulWidget {
 }
 
 class _ManageChildrenPageState extends State<ManageChildrenPage> {
-  final List<Child> _children = [];
+
 
   @override
   void initState() {
     super.initState();
-    // Sample data
-    _children.addAll([
-      Child(
-        name: 'Alice Johnson',
-        age: 3,
-        nextVaccinationDate: DateTime.now().add(Duration(days: 30)),
-        profileImage: 'assets/avatars/avatar1.png',
-        dateOfBirth: DateTime(2003),
-        height: 180,
-        weight: 80,
-        color: Colors.lightBlueAccent,
-        pastVaccinations: [], gender: 'Female',
-      ),
-      Child(
-        name: 'John Smith',
-        age: 5,
-        nextVaccinationDate: DateTime.now().add(Duration(days: 60)),
-        profileImage: 'assets/avatars/avatar2.png',
-        dateOfBirth: DateTime(2010),
-        height: 150,
-        weight: 50,
-        color: Colors.lightGreenAccent,
-        pastVaccinations: [], gender: 'Male',
-      ),
-    ]);
+
   }
 
   void _viewChildProfile(Child child) {
@@ -120,6 +98,7 @@ class _ManageChildrenPageState extends State<ManageChildrenPage> {
 
   @override
   Widget build(BuildContext context) {
+    final childrenProvider = Provider.of<ChildrenProvider>(context);
     return Scaffold(
       backgroundColor: Color(0xFF52C6A9),
       appBar: AppBar(
@@ -133,7 +112,7 @@ class _ManageChildrenPageState extends State<ManageChildrenPage> {
             borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(26), topRight: Radius.circular(26))),
         child:  ListView(
-          children: _children.map((child) => _buildChildCard(child)).toList(),
+          children: childrenProvider.children.map((child) => _buildChildCard(child)).toList(),
         ),
       ),
 

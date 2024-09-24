@@ -1,12 +1,19 @@
 import 'package:babyshieldx/base.dart';
 import 'package:babyshieldx/coverpage.dart';
+import 'package:babyshieldx/models/child_provider.dart';
 import 'package:babyshieldx/sign_in.dart';
 import 'package:babyshieldx/sign_up_as.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'homepage.dart'; // Import your homepage
 
 void main() {
-  runApp(MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => ChildrenProvider(),
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

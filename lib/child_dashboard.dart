@@ -1,4 +1,7 @@
+import 'package:babyshieldx/models/child_provider.dart';
+import 'package:babyshieldx/schedule.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'models/models.dart'; // Assuming models.dart contains the Child class
 
 class ChildDashboard extends StatelessWidget {
@@ -6,8 +9,11 @@ class ChildDashboard extends StatelessWidget {
 
   ChildDashboard({required this.child});
 
+
   @override
   Widget build(BuildContext context) {
+    final childrenProvider = Provider.of<ChildrenProvider>(context);
+
     return Stack(
       alignment: Alignment.topLeft,
       children: [
@@ -116,7 +122,15 @@ class ChildDashboard extends StatelessWidget {
                         icon: Icons.schedule,
                         title: "View Schedule",
                         onTap: () {
-                          // Handle View Schedule tap
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => VaccineSchedulePage(
+                                children: childrenProvider.children, // Pass the relevant child or children
+                                initialIndex: 0, // If needed, you can set an initial index
+                              ),
+                            ),
+                          );
                         }),
                     _buildDashboardOption(
                         icon: Icons.bar_chart,
