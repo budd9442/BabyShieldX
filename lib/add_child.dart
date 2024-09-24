@@ -12,9 +12,10 @@ class _AddChildScreenState extends State<AddChildScreen> {
   String _selectedAvatar = 'assets/avatars/avatar1.png'; // Default avatar
   String _name = '';
   DateTime _dateOfBirth = DateTime.now();
-  double _height = 0.0;
   double _weight = 0.0;
-  Color _selectedColor = Colors.lightBlueAccent;
+  double _height = 0.0;
+  String _gender = 'Female';
+  final List<String> _genders = ['Female', 'Male', 'Other'];
 
   final List<String> _avatars = [
     'assets/avatars/avatar1.png',
@@ -29,21 +30,6 @@ class _AddChildScreenState extends State<AddChildScreen> {
     'assets/avatars/avatar10.png',
   ];
 
-  final List<Color> _pastelColors = [
-    Colors.pinkAccent.shade100,
-    Colors.lightBlueAccent.shade100,
-    Colors.greenAccent.shade100,
-    Colors.yellowAccent.shade100,
-    Colors.orangeAccent.shade100,
-    Colors.purpleAccent.shade100,
-    Colors.tealAccent.shade100,
-    Colors.blueGrey.shade100,
-    Colors.cyanAccent.shade100,
-    Colors.amberAccent.shade100,
-    Colors.limeAccent.shade100,
-    Colors.redAccent.shade100,
-  ];
-
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -51,10 +37,31 @@ class _AddChildScreenState extends State<AddChildScreen> {
       firstDate: DateTime(2000),
       lastDate: DateTime.now(),
     );
-    if (picked != null && picked != _dateOfBirth)
+    if (picked != null && picked != _dateOfBirth) {
       setState(() {
         _dateOfBirth = picked;
       });
+    }
+  }
+
+  void _scanQrCode(){
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Scan QR code"),
+          content: Text('Not Implemented yet'),
+          actions: [
+            TextButton(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _openAvatarSelection() {
@@ -64,9 +71,9 @@ class _AddChildScreenState extends State<AddChildScreen> {
         return Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            SizedBox(height: 10,),
-            Text("Select an avatar",style: TextStyle(fontSize: 20),),
-            SizedBox(height: 30,),
+            SizedBox(height: 10),
+            Text("Select an avatar", style: TextStyle(fontSize: 20)),
+            SizedBox(height: 30),
             Container(
               height: 300,
               child: GridView.builder(
@@ -102,13 +109,12 @@ class _AddChildScreenState extends State<AddChildScreen> {
                   );
                 },
               ),
-            )
+            ),
           ],
         );
       },
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -117,115 +123,314 @@ class _AddChildScreenState extends State<AddChildScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color(0xFF52C6A9),
-        title: Text("Add Child"),
+        title: Text("Add Child Details"),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
+
+        actions: [
+
+          IconButton(onPressed: _scanQrCode, icon: Icon(Icons.qr_code,size: 32,)),
+          SizedBox(width: 10,),
+        ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Avatar selection
-            Center(
-              child: GestureDetector(
-                onTap: _openAvatarSelection,
-                child: CircleAvatar(
-                  backgroundImage: AssetImage(_selectedAvatar),
-                  radius: 80,
-                  backgroundColor: Colors.transparent,
+      body: Container(
+          color: Color(0xFF52C6A9),
+              child: Container(
+
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.all(Radius.circular(30)),
                 ),
-              ),
-            ),
-            SizedBox(height: 20),
-            TextFormField(
-              decoration: InputDecoration(labelText: "Name"),
-              onChanged: (value) => setState(() {
-                _name = value;
-              }),
-            ),
-            SizedBox(height: 20),
-            TextFormField(
-              decoration: InputDecoration(labelText: "Height (cm)"),
-              keyboardType: TextInputType.number,
-              onChanged: (value) => setState(() {
-                _height = double.tryParse(value) ?? _height;
-              }),
-            ),
-            SizedBox(height: 20),
-            TextFormField(
-              decoration: InputDecoration(labelText: "Weight (kg)"),
-              keyboardType: TextInputType.number,
-              onChanged: (value) => setState(() {
-                _weight = double.tryParse(value) ?? _weight;
-              }),
-            ),
-            SizedBox(height: 20),
-            ListTile(
-              title: Text("Date of Birth: ${_dateOfBirth.toLocal().toString().split(' ')[0]}"),
-              trailing: Icon(Icons.calendar_today),
-              onTap: () => _selectDate(context),
-            ),
-            SizedBox(height: 20),
-            Text("Select a Color"),
-            SizedBox(height: 10),
-            Container(
-              height: 50,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: _pastelColors.length,
-                itemBuilder: (context, index) {
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _selectedColor = _pastelColors[index];
-                      });
-                    },
-                    child: Container(
-                      width: 40,
-                      height: 40,
-                      margin: EdgeInsets.symmetric(horizontal: 4),
-                      decoration: BoxDecoration(
-                        color: _pastelColors[index],
-                        shape: BoxShape.circle,
-                        border: _selectedColor == _pastelColors[index]
-                            ? Border.all(color: Colors.black, width: 2)
-                            : null,
+                child: Stack(
+                  children: [
+                    Container(
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF52C6A9),
+                        borderRadius: BorderRadius.all(Radius.circular(30)),
+                      ),
+                      margin: const EdgeInsets.all(20.0),
+                      padding: const EdgeInsets.all(10.0),
+                      child:
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Center(
+                            child: GestureDetector(
+                              onTap: _openAvatarSelection,
+                              child: Stack(
+                                alignment: Alignment.bottomRight, // Align the edit icon to the bottom right corner
+                                children: [
+                                  CircleAvatar(
+                                    backgroundImage: AssetImage(_selectedAvatar),
+                                    radius: 100,
+                                    backgroundColor: Colors.transparent,
+                                  ),
+                                  GestureDetector(
+                                    onTap: _openAvatarSelection, // Call the function to open avatar selection
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Color(0xFF52C6A9), // Background color for the icon
+                                        shape: BoxShape.circle,
+                                        // Make it circular
+                                      ),
+                                      child: Icon(
+                                        Icons.add_circle_outlined, // Edit icon
+                                        color: Colors.white, // Icon color
+                                        size: 40, // Icon size
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+                            ),
+                          ),
+                          SizedBox(height: 30),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Child's Name",
+                                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                    ),
+                                    SizedBox(height: 5),
+                                    TextFormField(
+                                      decoration: InputDecoration(
+                                        filled: true,
+                                        fillColor: Colors.transparent,
+                                        enabledBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(15),
+                                          borderSide: BorderSide(color: Colors.white),
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(15),
+                                          borderSide: BorderSide(color: Colors.white),
+                                        ),
+                                      ),
+                                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                      onChanged: (value) => setState(() {
+                                        _name = value;
+                                      }),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(width: 10),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Gender",
+                                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                    ),
+                                    SizedBox(height: 5),
+                                    DropdownButtonFormField<String>(
+                                      dropdownColor: Colors.teal.shade500,
+                                      value: _gender,
+                                      items: _genders
+                                          .map((gender) => DropdownMenuItem(
+                                        value: gender,
+                                        child: Text(gender, style: TextStyle(color: Colors.white)),
+                                      ))
+                                          .toList(),
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _gender = value ?? 'Female';
+                                        });
+                                      },
+                                      decoration: InputDecoration(
+                                        enabledBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(15),
+                                          borderSide: BorderSide(color: Colors.white),
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(15),
+                                          borderSide: BorderSide(color: Colors.white),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 20),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Child's Height",
+                                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                    ),
+                                    SizedBox(height: 5),
+                                    TextFormField(
+                                      decoration: InputDecoration(
+                                        hintText: "Ex: 100 cm",
+                                        hintStyle: TextStyle(color: Colors.white54),
+                                        enabledBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(15),
+                                          borderSide: BorderSide(color: Colors.white),
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(15),
+                                          borderSide: BorderSide(color: Colors.white),
+                                        ),
+                                      ),
+                                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                      keyboardType: TextInputType.number,
+                                      onChanged: (value) => setState(() {
+                                        _height = double.tryParse(value) ?? _height;
+                                      }),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(width: 10),
+
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Child's Weight",
+                                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                    ),
+                                    SizedBox(height: 5),
+                                    TextFormField(
+                                      decoration: InputDecoration(
+                                        hintText: "Ex: 2.5 kg",
+                                        hintStyle: TextStyle(color: Colors.white54),
+                                        enabledBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(15),
+                                          borderSide: BorderSide(color: Colors.white),
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(15),
+                                          borderSide: BorderSide(color: Colors.white),
+                                        ),
+                                      ),
+                                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                      keyboardType: TextInputType.number,
+                                      onChanged: (value) => setState(() {
+                                        _weight = double.tryParse(value) ?? _weight;
+                                      }),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 20),
+                          Text(
+                            "Date of Birth",
+                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                          ),
+
+                          SizedBox(height: 5),
+                          Container(
+                            child: GestureDetector(
+                              onTap: () => _selectDate(context),
+                              child: Container(
+                                padding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                                width: MediaQuery.of(context).size.width / 2 - 35 ,
+                                decoration: BoxDecoration(
+                                  color: Colors.transparent,
+                                  border: Border.all(color: Colors.white),
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      _dateOfBirth.toLocal().toString().split(' ')[0],
+                                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                    ),
+                                    Icon(Icons.calendar_today, color: Colors.white),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 20,),
+                          SizedBox(
+
+                            width: MediaQuery.of(context).size.width / 2 - 35, // Makes the button take the full width of the container
+                            child: ElevatedButton(
+                              onPressed: () {
+                                // Save new child
+                                final newChild = Child(
+                                  height: _height,
+                                  name: _name,
+                                  dateOfBirth: _dateOfBirth,
+                                  weight: _weight,
+                                  profileImage: _selectedAvatar,
+                                  color: _gender == 'Female' ? Colors.pinkAccent.withAlpha(100) : Colors.lightBlueAccent.withAlpha(100), // Pastel blue for boys, pastel pink for girls
+
+                                  age: DateTime.now().year - _dateOfBirth.year, // Calculate age
+                                  nextVaccinationDate: DateTime.now().add(Duration(days: 30)), // Default date
+                                  pastVaccinations: [],
+                                  gender: _gender,
+                                  vaccines: [],
+                                );
+                                childrenProvider.addChild(newChild); // Add child to provider
+                                Navigator.pop(context); // Close the screen
+                              },
+                              child: Text(
+                                " Save ",
+                                style: TextStyle(color: Colors.teal, fontWeight: FontWeight.bold,fontSize: 18), // Set text color and make it bold
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white, // Set the background color to white
+                                side: BorderSide(color: Colors.teal, width: 2), // Add teal border
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15), // Optional: set border radius
+                                ),
+                              ),
+                            ),
+                          ),
+
+
+
+
+                        ],
                       ),
                     ),
-                  );
-                },
-              ),
-            ),
-            SizedBox(height: 30),
-            ElevatedButton(
-              onPressed: () {
-                // Save new child
-                final newChild = Child(
-                  name: _name,
-                  dateOfBirth: _dateOfBirth,
-                  height: _height,
-                  weight: _weight,
-                  profileImage: _selectedAvatar,
-                  color: _selectedColor,
-                  age: DateTime.now().year - _dateOfBirth.year, // Calculate age
-                  nextVaccinationDate: DateTime.now().add(Duration(days: 30)), // Set a default next vaccination date
-                  pastVaccinations: [],
-                  gender: '', // You can modify this based on your needs
-                  vaccines: [],
-                );
-                childrenProvider.addChild(newChild); // Add child to provider
-                Navigator.pop(context); // Close the screen
-              },
-              child: Text("Add Child"),
-            ),
-          ],
-        ),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Container(
+                              margin: EdgeInsets.only(bottom: 30),
+                              child: Image.asset(
+                                'assets/child_with_parent.png', // Make sure this path matches your asset location
+                                height: 220,
+                              ),
+                            )
+
+                          ],
+                        )
+                      ],
+                    )
+                  ],
+                ),
+
+
       ),
+      )
     );
   }
 }

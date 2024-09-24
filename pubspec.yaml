@@ -79,6 +79,7 @@ flutter:
     - assets/avatars/avatar8.png
     - assets/avatars/avatar9.png
     - assets/avatars/avatar10.png
+    - assets/child_with_parent.png
 
 
   # An image asset can refer to one or more resolution-specific "variants", see
