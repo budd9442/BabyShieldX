@@ -12,7 +12,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return
+      Scaffold(
       backgroundColor: Color(0xFF52C6A9),
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(130),
@@ -73,7 +74,7 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-      body: Container(
+      body: SingleChildScrollView(
         child: Container(
           decoration: const BoxDecoration(
               color: Colors.white,
