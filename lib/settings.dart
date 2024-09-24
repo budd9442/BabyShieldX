@@ -10,6 +10,7 @@ class SettingsPage extends StatelessWidget {
       ),
       body: ListView(
         children: [
+          SizedBox(height: 40,),
           _buildSettingItem(context, 'Profile Settings', Icons.person),
           _buildSettingItem(context, 'Notification Settings', Icons.notifications),
           _buildSettingItem(context, 'Theme Settings', Icons.color_lens),
@@ -22,8 +23,8 @@ class SettingsPage extends StatelessWidget {
 
   Widget _buildSettingItem(BuildContext context, String title, IconData icon) {
     return ListTile(
-      leading: Icon(icon, color: Color(0xFF52C6A9)), // Icon for the setting
-      title: Text(title),
+      leading: Icon(icon, color: Color(0xFF52C6A9),size: 36,), // Icon for the setting
+      title: Text(title,style: TextStyle(fontSize: 20),),
       trailing: Icon(Icons.chevron_right), // Arrow icon to indicate more settings
       onTap: () {
         // Navigate to respective settings page (not implemented)

@@ -1,6 +1,8 @@
 import 'package:babyshieldx/base.dart';
 import 'package:babyshieldx/coverpage.dart';
+import 'package:babyshieldx/hospital_register.dart';
 import 'package:babyshieldx/models/child_provider.dart';
+import 'package:babyshieldx/parent_register.dart';
 import 'package:babyshieldx/sign_in.dart';
 import 'package:babyshieldx/sign_up_as.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +27,8 @@ class MyApp extends StatelessWidget {
         '/signup': (context) => SignUpMenu(),
         '/login': (context) => SignInPage(),
         '/hospital_signup': (context) => HospitalSignUp(),
-        '/parent_signup': (context) => ParentSignUp(),
+        '/parent_signup': (context) => ParentRegisterScreen(),
+        '/hospital_signup': (context) => HospitalSignUpScreen(),
         '/home' : (context) => TabBase(),
 
       },

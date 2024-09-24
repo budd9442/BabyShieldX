@@ -1,3 +1,4 @@
+import 'package:babyshieldx/parent_register.dart';
 import 'package:flutter/material.dart';
 
 class SignUpMenu extends StatelessWidget {
@@ -117,12 +118,4 @@ class HospitalSignUp extends StatelessWidget {
 }
 
 // Placeholder for Parent Sign Up Page
-class ParentSignUp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("Parent Sign Up")),
-      body: Center(child: Text("Parent Sign Up Page")),
-    );
-  }
-}
+

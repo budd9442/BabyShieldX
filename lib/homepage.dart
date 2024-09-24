@@ -1,4 +1,7 @@
+import 'package:babyshieldx/models/child_provider.dart';
+import 'package:babyshieldx/schedule.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -12,6 +15,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final childrenProvider = Provider.of<ChildrenProvider>(context);
     return Scaffold(
       backgroundColor: Color(0xFF52C6A9),
       appBar: PreferredSize(
@@ -43,32 +47,147 @@ class _HomePageState extends State<HomePage> {
         child: ListView(
           padding: EdgeInsets.zero,
           children: <Widget>[
-            const DrawerHeader(
-              decoration: BoxDecoration(
+            DrawerHeader(
+              decoration: const BoxDecoration(
                 color: Colors.teal,
               ),
-              child: Text(
-                'Menu',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                ),
+              child: Stack(
+                children: [
+                  const Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text("BabyShieldX",style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold,fontSize: 28),),
+
+                      Text(
+                        "Let's Get \nVaccinated!",
+                        textAlign: TextAlign.left, // This is optional when using Column
+                        style: TextStyle(fontSize: 16,color:  Colors.white), // You can customize the style
+                      ),
+                      SizedBox()
+
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Image.asset('assets/doctor_child.png', height: 100)
+                        ],
+                      )
+                    ],
+                  )
+                ],
               ),
             ),
             ListTile(
-              leading: Icon(Icons.home),
-              title: Text('Home'),
+              tileColor: Colors.teal.shade200,
+              leading: Icon(Icons.home, size: 32),
+              title: const Text(
+                'Home',
+                style: TextStyle(fontSize: 22),
+              ),
+              trailing: Icon(Icons.arrow_forward_ios_outlined),
               onTap: () {
                 // Handle navigation
               },
             ),
+            const SizedBox(height: 10,),
             ListTile(
-              leading: Icon(Icons.calendar_today),
-              title: Text('Calendar'),
+              tileColor: Colors.teal.shade200,
+              leading: const Icon(Icons.child_friendly, size: 32),
+              title: const Text(
+                'Child List',
+                style: TextStyle(fontSize: 22),
+              ),
+              trailing: const Icon(Icons.arrow_forward_ios_outlined),
               onTap: () {
                 // Handle navigation
               },
             ),
+            const SizedBox(height: 10,),
+            ListTile(
+              tileColor: Colors.teal.shade200,
+              leading: const Icon(Icons.calendar_month, size: 32),
+              title: const Text(
+                'Calendar',
+                style: TextStyle(fontSize: 22),
+              ),
+              trailing: const Icon(Icons.arrow_forward_ios_outlined),
+              onTap: () {
+                // Handle navigation
+              },
+            ),
+            const SizedBox(height: 10,),
+            ListTile(
+              tileColor: Colors.teal.shade200,
+              leading: const Icon(Icons.health_and_safety, size: 32),
+              title: const Text(
+                'Doctor Channeling',
+                style: TextStyle(fontSize: 22),
+              ),
+              trailing: const Icon(Icons.arrow_forward_ios_outlined),
+              onTap: () {
+                // Handle navigation
+              },
+            ),
+            const SizedBox(height: 10,),
+            ListTile(
+              tileColor: Colors.teal.shade200,
+              leading: const Icon(Icons.location_on, size: 32),
+              title: const Text(
+                'Vaccine Centers',
+                style: TextStyle(fontSize: 22),
+              ),
+              trailing: const Icon(Icons.arrow_forward_ios_outlined),
+              onTap: () {
+                // Handle navigation
+              },
+            ),
+            const SizedBox(height: 10,),
+            ListTile(
+              tileColor: Colors.teal.shade200,
+              leading: const Icon(Icons.settings, size: 32),
+              title: const Text(
+                'Settings',
+                style: TextStyle(fontSize: 22),
+              ),
+              trailing: const Icon(Icons.arrow_forward_ios_outlined),
+              onTap: () {
+
+                // Handle navigation
+              },
+            ),
+            const SizedBox(height: 10,),
+            ListTile(
+              tileColor: Colors.teal.shade200,
+              leading: const Icon(Icons.emoji_people, size: 32),
+              title: const Text(
+                'About Us',
+                style: TextStyle(fontSize: 22),
+              ),
+              trailing: const Icon(Icons.arrow_forward_ios_outlined),
+              onTap: () {
+                // Handle navigation
+              },
+            ),
+            const SizedBox(height: 10,),
+            ListTile(
+              tileColor: Colors.teal.shade200,
+              leading: const Icon(Icons.logout, size: 32),
+              title: const Text(
+                'Log Out',
+                style: TextStyle(fontSize: 22),
+              ),
+              trailing: const Icon(Icons.arrow_forward_ios_outlined),
+              onTap: () {
+                // Handle navigation
+              },
+            ),
+            const SizedBox(height: 10,),
+
             // Add more menu items as needed
           ],
         ),
@@ -123,6 +242,15 @@ class _HomePageState extends State<HomePage> {
                                 ),
                                 ElevatedButton(
                                   onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => VaccineSchedulePage(
+                                          children: childrenProvider.children, // Pass the relevant child or children
+                                          initialIndex: 0, // If needed, you can set an initial index
+                                        ),
+                                      ),
+                                    );
                                     // Navigate to schedule
                                   },
                                   child: Text('View schedule'),
