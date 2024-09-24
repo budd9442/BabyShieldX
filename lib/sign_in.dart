@@ -99,9 +99,10 @@ class _SignInPageState extends State<SignInPage> {
               // Sign In Button
               ElevatedButton(
                 onPressed: () {
-                  if (_formKey.currentState?.validate() ?? false) {
-                    // Perform sign-in action
-                  }
+                  Navigator.pushNamed(context, '/home');
+                  // if (_formKey.currentState?.validate() ?? false) {
+                  //   // Perform sign-in action
+                  // }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color(0xFF61C5B1), // Green color

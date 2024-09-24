@@ -1,4 +1,5 @@
 // Import the ChildDashboard screen
+import 'package:babyshieldx/add_child.dart';
 import 'package:babyshieldx/child_dashboard.dart'; // Assuming you've saved the ChildDashboard as 'child_dashboard.dart'.
 import 'package:babyshieldx/models/child_provider.dart';
 
@@ -117,7 +118,10 @@ class _ManageChildrenPageState extends State<ManageChildrenPage> {
       ),
 
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _addOrEditChildPopup(),
+        onPressed: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => AddChildScreen()), // Open AddChildScreen
+        ),
         child: Icon(Icons.add),
         backgroundColor: Color(0xFF52C6A9),
       ),

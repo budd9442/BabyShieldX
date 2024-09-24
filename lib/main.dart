@@ -20,13 +20,14 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: TabBase(),
+      home:  CoverPage(),
       routes: {
         '/signup': (context) => SignUpMenu(),
         '/login': (context) => SignInPage(),
         '/hospital_signup': (context) => HospitalSignUp(),
         '/parent_signup': (context) => ParentSignUp(),
-        '/home' : (context) => const HomePage(),
+        '/home' : (context) => TabBase(),
+
       },
     );
   }
