@@ -78,18 +78,25 @@ class _HomePageState extends State<HomePage> {
           decoration: const BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(16), topRight: Radius.circular(16))),
+                  topLeft: Radius.circular(26), topRight: Radius.circular(26))),
           child: Container(
             child: Padding(
               padding: const EdgeInsets.all(20),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Card(
-                    color: Color(0xFF52C6A9),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15.0),
+                  Container(
+
+
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [Color(0xFF52C6A9), Color.lerp(Colors.white,Color(0xFF52C6A9), 0.6)!],
+                        end: Alignment.bottomLeft,
+                        begin: Alignment.topRight,
+                      ),
+                      borderRadius: BorderRadius.circular(16),
                     ),
+
                     child: Padding(
                       padding: const EdgeInsets.all(20),
                       child: Row(
