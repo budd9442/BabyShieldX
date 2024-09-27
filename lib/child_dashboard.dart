@@ -2,13 +2,13 @@ import 'package:babyshieldx/models/child_provider.dart';
 import 'package:babyshieldx/schedule.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:mobile_scanner/mobile_scanner.dart'; // Import the mobile scanner package
 import 'models/models.dart'; // Assuming models.dart contains the Child class
 
 class ChildDashboard extends StatelessWidget {
   final Child child;
 
   ChildDashboard({required this.child});
-
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +30,9 @@ class ChildDashboard extends StatelessWidget {
                 Card(
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16)),
-                  color: child.color,
+                  color: child.gender == 'Female'
+                      ? Colors.pinkAccent.withAlpha(100)
+                      : Colors.lightBlueAccent.withAlpha(100),
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Row(
@@ -53,7 +55,7 @@ class ChildDashboard extends StatelessWidget {
                               ),
                               SizedBox(height: 4),
                               Text(
-                                "${child.age} months old",
+                                "${DateTime.now().year - child.dateOfBirth.year} years old",
                                 style: TextStyle(
                                     fontSize: 16, color: Colors.black54),
                               ),
@@ -66,7 +68,12 @@ class ChildDashboard extends StatelessWidget {
                             ],
                           ),
                         ),
-                        Icon(Icons.qr_code, color: Colors.black54),
+                        IconButton(
+                          icon: Icon(Icons.qr_code, color: Colors.black54, size: 36),
+                          onPressed: () {
+                            _scanQRCode(context); // Call the QR code scanner
+                          },
+                        ),
                       ],
                     ),
                   ),
@@ -186,7 +193,7 @@ class ChildDashboard extends StatelessWidget {
                           value: child.vaccinationProgress / 100,
                           backgroundColor: Colors.grey.shade300,
                           valueColor:
-                              AlwaysStoppedAnimation<Color>(Colors.green),
+                          AlwaysStoppedAnimation<Color>(Colors.green),
                         ),
                       ],
                     ),
@@ -197,39 +204,72 @@ class ChildDashboard extends StatelessWidget {
           ),
         ),
         Padding(
-            padding: EdgeInsets.fromLTRB(10, 25, 0, 0),
-            child: Row(
-              children: [
-                IconButton(
-                  icon: Icon(
-                    Icons.arrow_back_ios_new_rounded,
-                    size: 32,
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
+          padding: EdgeInsets.fromLTRB(10, 25, 0, 0),
+          child: Row(
+            children: [
+              IconButton(
+                icon: Icon(
+                  Icons.arrow_back_ios_new_rounded,
+                  size: 32,
                 ),
-                Text(
-                  "Profile",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    decoration: TextDecoration.none,
-                  ),
-
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+              Text(
+                "Profile",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  decoration: TextDecoration.none,
                 ),
-              ],
-            ))
+              ),
+            ],
+          ),
+        )
       ],
     );
   }
 
-  Widget _buildDashboardOption(
-      {required IconData icon,
-      required String title,
-      required VoidCallback onTap}) {
+  // Function to open the QR Code scanner
+  void _scanQRCode(BuildContext context) async {
+    final String? scannedCode = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => QRCodeScanner(),
+      ),
+    );
+
+    if (scannedCode != null) {
+      // Do something with the scanned code
+      print('Scanned QR Code: $scannedCode');
+      // For example, you could show a dialog with the scanned code
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Scanned QR Code'),
+          content: Text(scannedCode),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+  Widget _buildDashboardOption({
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+  }) {
+    Color accentColor = child.gender == 'Female'
+        ? Colors.pinkAccent.withAlpha(100)
+        : Colors.lightBlueAccent.withAlpha(100);
     return GestureDetector(
       onTap: onTap,
       child: Card(
@@ -238,10 +278,7 @@ class ChildDashboard extends StatelessWidget {
           padding: EdgeInsets.all(16),
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [
-                Color.lerp(Colors.white, child.color, 0.6)!,
-                child.color
-              ],
+              colors: [Color.lerp(Colors.white, accentColor, 0.6)!, accentColor],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -255,12 +292,49 @@ class ChildDashboard extends StatelessWidget {
               Text(
                 title,
                 textAlign: TextAlign.center,
-                style:
-                    const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.bold),
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+// QR Code Scanner Page
+class QRCodeScanner extends StatefulWidget {
+  @override
+  _QRCodeScannerState createState() => _QRCodeScannerState();
+}
+
+class _QRCodeScannerState extends State<QRCodeScanner> {
+  MobileScannerController cameraController = MobileScannerController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("QR Code Scanner"),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.flash_on),
+            onPressed: () => cameraController.toggleTorch(),
+          ),
+        ],
+      ),
+      body: MobileScanner(
+        controller: cameraController,
+        onDetect: (capture) {
+          final List<Barcode> barcodes = capture.barcodes;
+          for (final barcode in barcodes) {
+            final String? code = barcode.rawValue;
+            if (code != null) {
+              Navigator.pop(context, code); // Return the scanned code
+            }
+          }
+        },
       ),
     );
   }

@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "282812596832",
+    "firebase_url": "https://babyshieldx-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "babyshieldx",
+    "storage_bucket": "babyshieldx.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:282812596832:android:6f5786ee0163586bef7905",
+        "android_client_info": {
+          "package_name": "com.example.babyShieldX"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDDJmqTmmT9MdISHYKRerLNySLVG4pTnkg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

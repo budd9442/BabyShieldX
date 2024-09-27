@@ -54,7 +54,7 @@ class _EditChildScreenState extends State<EditChildScreen> {
     _dateOfBirth = widget.child.dateOfBirth;
     _height = widget.child.height;
     _weight = widget.child.weight;
-    _selectedColor = widget.child.color;
+
   }
 
   Future<void> _selectDate(BuildContext context) async {
@@ -225,7 +225,6 @@ class _EditChildScreenState extends State<EditChildScreen> {
                   widget.child.dateOfBirth = _dateOfBirth;
                   widget.child.height = _height;
                   widget.child.weight = _weight;
-                  widget.child.color = _selectedColor;
                   widget.child.profileImage = _selectedAvatar;
                 });
                 Navigator.pop(context, widget.child); // Return the updated child object

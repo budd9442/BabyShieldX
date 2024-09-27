@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ParentRegisterScreen extends StatelessWidget {
   final TextEditingController parentNameController = TextEditingController();
@@ -70,19 +71,56 @@ class ParentRegisterScreen extends StatelessWidget {
             ),
             const SizedBox(height: 30),
             ElevatedButton(
-              onPressed: () {
-                // Register logic goes here
+              onPressed: () async {
+                if (passwordController.text == confirmPasswordController.text) {
+                  try {
+                    // Register user using Supabase auth
+                    final response = await Supabase.instance.client.auth.signUp(
+                      email: emailController.text,
+                      password: passwordController.text,
+                      data: {
+                        'parent_name': parentNameController.text,
+                        'nic': nicController.text,
+                        'phone': phoneController.text,
+                      },
+                    );
+
+                    if (response.user != null) {
+                      // User registered successfully
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text("Registration Successful!"),
+                      ));
+                      Navigator.pushNamed(context, '/login');
+                    } else if (response.user != null) {
+                      // Show error if registration fails
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text("Error"),
+                      ));
+                    }
+                  } catch (e) {
+                    // Handle any other errors
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text('Error: $e'),
+
+
+                    ));
+                  }
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Passwords do not match')),
+                  );
+                }
               },
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                backgroundColor:  Colors.teal,
+                backgroundColor: Colors.teal,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30),
                 ),
               ),
               child: const Text(
                 'Register',
-                style: TextStyle(fontSize: 18,color: Colors.white),
+                style: TextStyle(fontSize: 18, color: Colors.white),
               ),
             ),
             const SizedBox(height: 20),

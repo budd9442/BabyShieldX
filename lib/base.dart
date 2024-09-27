@@ -4,22 +4,53 @@ import 'package:babyshieldx/manage_children.dart';
 import 'package:babyshieldx/settings.dart';
 import 'package:flutter/material.dart';
 
-class TabBase extends StatelessWidget {
+class TabBase extends StatefulWidget {
+  final int initialIndex;
+
+  TabBase({this.initialIndex = 0});
+
+  @override
+  _TabBaseState createState() => _TabBaseState();
+}
+
+class _TabBaseState extends State<TabBase> with SingleTickerProviderStateMixin {
+  TabController? _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(
+      length: 4, // Number of tabs
+      vsync: this,
+      initialIndex: widget.initialIndex,
+    );
+  }
+
+  @override
+  void dispose() {
+    _tabController?.dispose();
+    super.dispose();
+  }
+
+  void changeTab(int index) {
+    setState(() {
+      _tabController?.animateTo(index);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: DefaultTabController(
-        length: 4,
-        child: Scaffold(
-          bottomNavigationBar: menu(),
-          body: TabBarView(
-            children: [
-              Container(child: HomePage()),
-              Container(child: CalendarPage()),
-              Container(child: ManageChildrenPage()),
-              Container(child: SettingsPage()),
-            ],
-          ),
+      home: Scaffold(
+        bottomNavigationBar: menu(),
+        body: TabBarView(
+          controller: _tabController,
+          children: [
+            HomePage(changeTab: changeTab), // Passing changeTab to HomePage
+            CalendarPage(),
+            ManageChildrenPage(),
+            SettingsPage(),
+          ],
         ),
       ),
     );
@@ -28,27 +59,15 @@ class TabBase extends StatelessWidget {
   Widget menu() {
     return Container(
       color: Color(0xFF52C6A9),
-
       child: TabBar(
+        controller: _tabController,
         labelColor: Colors.black87,
         unselectedLabelColor: Colors.white70,
-
-        dividerHeight: 0,
-        labelPadding: EdgeInsets.only(top: 15,bottom: 5),
         tabs: [
-          Tab(
-
-            icon: Icon(Icons.home,size: 45,),
-          ),
-          Tab(
-            icon: Icon(Icons.calendar_month,size : 45),
-          ),
-          Tab(
-            icon: Icon(Icons.person,size : 45),
-          ),
-          Tab(
-            icon: Icon(Icons.settings,size: 45,),
-          ),
+          Tab(icon: Icon(Icons.home, size: 45)),
+          Tab(icon: Icon(Icons.calendar_month, size: 45)),
+          Tab(icon: Icon(Icons.person, size: 45)),
+          Tab(icon: Icon(Icons.settings, size: 45)),
         ],
       ),
     );

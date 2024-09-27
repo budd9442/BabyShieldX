@@ -1,10 +1,16 @@
+import 'package:babyshieldx/add_child.dart';
+import 'package:babyshieldx/base.dart';
 import 'package:babyshieldx/models/child_provider.dart';
 import 'package:babyshieldx/schedule.dart';
+import 'package:babyshieldx/vaccine_details.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final Function(int) changeTab; // Accept the function to switch tabs
+
+  HomePage({required this.changeTab});
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -13,35 +19,42 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
+  Future<void> _handleSignOut() async {
+    // Sign out the user
+    await Supabase.instance.client.auth.signOut();
+    Navigator.pushReplacementNamed(context, '/login'); // Redirect to login page
+  }
+
   @override
   Widget build(BuildContext context) {
     final childrenProvider = Provider.of<ChildrenProvider>(context);
+
     return Scaffold(
-      backgroundColor: Color(0xFF52C6A9),
+      backgroundColor: const Color(0xFF52C6A9),
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(130),
+        preferredSize: const Size.fromHeight(130),
         child: Padding(
-            padding: EdgeInsets.fromLTRB(0, 60, 0, 0),
-            child: AppBar(
-              iconTheme: const IconThemeData(size: 44),
-              //shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(bottom: Radius.circular(10))),
-              backgroundColor: Color(0xFF52C6A9),
-              title: const Text(
-                'Hello,\nSupun Dharmaratne',
-                style: TextStyle(
-                    color: Colors.black87, fontWeight: FontWeight.w900),
-              ),
-              actions: const [
-                Padding(
-                  padding: EdgeInsets.only(right: 30),
-                  child: CircleAvatar(
-                    minRadius: 30,
-                    backgroundImage: AssetImage(
-                        'assets/profile.png'), // Change this path accordingly
-                  ),
+          padding: const EdgeInsets.fromLTRB(0, 60, 0, 0),
+          child: AppBar(
+            iconTheme: const IconThemeData(size: 44),
+            backgroundColor: const Color(0xFF52C6A9),
+            title: Text(
+              'Hello,\n${Supabase.instance.client.auth.currentUser!.userMetadata?["parent_name"]}',
+              style: const TextStyle(
+                  color: Colors.black87, fontWeight: FontWeight.w900),
+            ),
+            actions: const [
+              Padding(
+                padding: EdgeInsets.only(right: 30),
+                child: CircleAvatar(
+                  minRadius: 30,
+                  backgroundImage: AssetImage(
+                      'assets/profile.png'), // Change this path accordingly
                 ),
-              ],
-            )),
+              ),
+            ],
+          ),
+        ),
       ),
       drawer: Drawer(
         child: ListView(
@@ -57,15 +70,19 @@ class _HomePageState extends State<HomePage> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text("BabyShieldX",style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold,fontSize: 28),),
-
+                      Text(
+                        "BabyShieldX",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 28),
+                      ),
                       Text(
                         "Let's Get \nVaccinated!",
-                        textAlign: TextAlign.left, // This is optional when using Column
-                        style: TextStyle(fontSize: 16,color:  Colors.white), // You can customize the style
+                        textAlign: TextAlign.left,
+                        style: TextStyle(fontSize: 16, color: Colors.white),
                       ),
-                      SizedBox()
-
+                      SizedBox(),
                     ],
                   ),
                   Row(
@@ -78,23 +95,26 @@ class _HomePageState extends State<HomePage> {
                         ],
                       )
                     ],
-                  )
+                  ),
                 ],
               ),
             ),
+            // Home navigation
             ListTile(
               tileColor: Colors.teal.shade200,
-              leading: Icon(Icons.home, size: 32),
+              leading: const Icon(Icons.home, size: 32),
               title: const Text(
                 'Home',
                 style: TextStyle(fontSize: 22),
               ),
-              trailing: Icon(Icons.arrow_forward_ios_outlined),
+              trailing: const Icon(Icons.arrow_forward_ios_outlined),
               onTap: () {
-                // Handle navigation
+                widget.changeTab(0); // Switch to Home tab
+                Navigator.pop(context); // Close the drawer
               },
             ),
-            const SizedBox(height: 10,),
+            const SizedBox(height: 10),
+            // Child List navigation
             ListTile(
               tileColor: Colors.teal.shade200,
               leading: const Icon(Icons.child_friendly, size: 32),
@@ -104,10 +124,12 @@ class _HomePageState extends State<HomePage> {
               ),
               trailing: const Icon(Icons.arrow_forward_ios_outlined),
               onTap: () {
-                // Handle navigation
+                widget.changeTab(2); // Switch to Manage Children tab
+                Navigator.pop(context); // Close the drawer
               },
             ),
-            const SizedBox(height: 10,),
+            const SizedBox(height: 10),
+            // Calendar navigation
             ListTile(
               tileColor: Colors.teal.shade200,
               leading: const Icon(Icons.calendar_month, size: 32),
@@ -117,10 +139,12 @@ class _HomePageState extends State<HomePage> {
               ),
               trailing: const Icon(Icons.arrow_forward_ios_outlined),
               onTap: () {
-                // Handle navigation
+                widget.changeTab(1); // Switch to Calendar tab
+                Navigator.pop(context); // Close the drawer
               },
             ),
-            const SizedBox(height: 10,),
+            const SizedBox(height: 10),
+            // Doctor Channeling
             ListTile(
               tileColor: Colors.teal.shade200,
               leading: const Icon(Icons.health_and_safety, size: 32),
@@ -130,10 +154,11 @@ class _HomePageState extends State<HomePage> {
               ),
               trailing: const Icon(Icons.arrow_forward_ios_outlined),
               onTap: () {
-                // Handle navigation
+                // Navigate to Doctor Channeling
               },
             ),
-            const SizedBox(height: 10,),
+            const SizedBox(height: 10),
+            // Vaccine Centers navigation
             ListTile(
               tileColor: Colors.teal.shade200,
               leading: const Icon(Icons.location_on, size: 32),
@@ -143,10 +168,11 @@ class _HomePageState extends State<HomePage> {
               ),
               trailing: const Icon(Icons.arrow_forward_ios_outlined),
               onTap: () {
-                // Handle navigation
+                // Navigate to Vaccine Centers
               },
             ),
-            const SizedBox(height: 10,),
+            const SizedBox(height: 10),
+            // Settings
             ListTile(
               tileColor: Colors.teal.shade200,
               leading: const Icon(Icons.settings, size: 32),
@@ -156,11 +182,12 @@ class _HomePageState extends State<HomePage> {
               ),
               trailing: const Icon(Icons.arrow_forward_ios_outlined),
               onTap: () {
-
-                // Handle navigation
+                widget.changeTab(3); // Switch to Settings tab
+                Navigator.pop(context); // Close the drawer
               },
             ),
-            const SizedBox(height: 10,),
+            const SizedBox(height: 10),
+            // About Us
             ListTile(
               tileColor: Colors.teal.shade200,
               leading: const Icon(Icons.emoji_people, size: 32),
@@ -170,10 +197,11 @@ class _HomePageState extends State<HomePage> {
               ),
               trailing: const Icon(Icons.arrow_forward_ios_outlined),
               onTap: () {
-                // Handle navigation
+                // Navigate to About Us
               },
             ),
-            const SizedBox(height: 10,),
+            const SizedBox(height: 10),
+            // Log Out
             ListTile(
               tileColor: Colors.teal.shade200,
               leading: const Icon(Icons.logout, size: 32),
@@ -183,12 +211,9 @@ class _HomePageState extends State<HomePage> {
               ),
               trailing: const Icon(Icons.arrow_forward_ios_outlined),
               onTap: () {
-                // Handle navigation
+                _handleSignOut();
               },
             ),
-            const SizedBox(height: 10,),
-
-            // Add more menu items as needed
           ],
         ),
       ),
@@ -205,12 +230,13 @@ class _HomePageState extends State<HomePage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    // Upcoming vaccination section
                     Container(
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [
-                            Color(0xFF52C6A9),
-                            Color.lerp(Colors.white, Color(0xFF52C6A9), 0.6)!
+                            const Color(0xFF52C6A9),
+                            Color.lerp(Colors.white, const Color(0xFF52C6A9), 0.6)!
                           ],
                           end: Alignment.bottomLeft,
                           begin: Alignment.topRight,
@@ -227,7 +253,7 @@ class _HomePageState extends State<HomePage> {
                                 const Row(
                                   children: [
                                     Text(
-                                      'Upcoming vaccination :',
+                                      'Upcoming vaccination:',
                                       style: TextStyle(
                                           fontSize: 20,
                                           fontWeight: FontWeight.bold,
@@ -237,7 +263,6 @@ class _HomePageState extends State<HomePage> {
                                 ),
                                 Image.asset(
                                   'assets/calendar_home.png',
-                                  // Change this path accordingly
                                   height: 120,
                                 ),
                                 ElevatedButton(
@@ -246,57 +271,60 @@ class _HomePageState extends State<HomePage> {
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) => VaccineSchedulePage(
-                                          children: childrenProvider.children, // Pass the relevant child or children
-                                          initialIndex: 0, // If needed, you can set an initial index
+                                          children: childrenProvider.children, // Pass the child list
+                                          initialIndex: 0, // Set the initial index if required
                                         ),
                                       ),
                                     );
-                                    // Navigate to schedule
                                   },
-                                  child: Text('View schedule'),
+                                  child: const Text('View schedule'),
                                 ),
                               ],
                             ),
                             const Flexible(
-                                child: Column(
-                              children: [
-                                SizedBox(
-                                  width: 20,
-                                ),
-                                Column(children: [
+                              child: Column(
+                                children: [
                                   SizedBox(
-                                    height: 30,
+                                    width: 20,
                                   ),
-                                  Text(
-                                    '03ʳᵈ',
-                                    style: TextStyle(
-                                        fontSize: 32,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white),
+                                  Column(
+                                    children: [
+                                      SizedBox(
+                                        height: 30,
+                                      ),
+                                      Text(
+                                        '03ʳᵈ',
+                                        style: TextStyle(
+                                            fontSize: 32,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white),
+                                      ),
+                                      Text(
+                                        'January',
+                                        style: TextStyle(
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white),
+                                      ),
+                                      SizedBox(
+                                        height: 20,
+                                      ),
+                                      Text(
+                                        'Mary Jane\nDTP-Hib-HepB',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                            fontSize: 16, color: Colors.white),
+                                      ),
+                                    ],
                                   ),
-                                  Text(
-                                    'January',
-                                    style: TextStyle(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white),
-                                  ),
-                                  SizedBox(
-                                    height: 20,
-                                  ),
-                                  Text(
-                                    'Mary Jane\nDTP-Hib-HepB',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        fontSize: 16, color: Colors.white),
-                                  ),
-                                ]),
-                              ],
-                            )),
+                                ],
+                              ),
+                            ),
                           ],
                         ),
                       ),
                     ),
+                    // Quick response card
                     Card(
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15.0),
@@ -316,14 +344,14 @@ class _HomePageState extends State<HomePage> {
                                       fontSize: 13,
                                     ),
                                   ),
-                                  SizedBox(height: 8),
+                                  const SizedBox(height: 8),
                                   Padding(
-                                    padding: EdgeInsets.only(left: 10),
+                                    padding: const EdgeInsets.only(left: 10),
                                     child: ElevatedButton(
                                       onPressed: () {
                                         // Quick response action
                                       },
-                                      child: Text('Quick response'),
+                                      child: const Text('Quick response'),
                                     ),
                                   ),
                                 ],
@@ -331,16 +359,16 @@ class _HomePageState extends State<HomePage> {
                             ),
                             Image.asset(
                               'assets/doctor.png',
-                              // Change this path accordingly
                               height: 110,
                             ),
                           ],
                         ),
                       ),
                     ),
-                    SizedBox(height: 32),
+                    const SizedBox(height: 32),
+                    // Bottom buttons
                     Container(
-                      margin: EdgeInsets.only(bottom: 110),
+                      margin: const EdgeInsets.only(bottom: 110),
                       child: Flex(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         direction: Axis.horizontal,
@@ -348,20 +376,23 @@ class _HomePageState extends State<HomePage> {
                           Expanded(
                             child: ElevatedButton.icon(
                               onPressed: () {
-                                // Define the action you want to perform on button press
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => VaccinePage(),
+                                  ),
+                                );
                               },
-                              icon: Icon(Icons.search, color: Colors.white),
-                              // Search icon
+                              icon: const Icon(Icons.search, color: Colors.white),
                               label: const Text(
                                 "Vaccination Details",
                                 style: TextStyle(
                                     color: Colors.white,
-                                    fontSize: 18), // Text color
+                                    fontSize: 18),
                               ),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Color(0xFF52C6A9),
-                                // Custom button color
-                                padding: EdgeInsets.symmetric(
+                                backgroundColor: const Color(0xFF52C6A9),
+                                padding: const EdgeInsets.symmetric(
                                     horizontal: 12, vertical: 12),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
@@ -369,23 +400,24 @@ class _HomePageState extends State<HomePage> {
                               ),
                             ),
                           ),
-                          SizedBox(
+                          const SizedBox(
                             width: 10,
                           ),
                           FloatingActionButton(
-                            onPressed: () {
-                              // Add vaccination record
-                            },
-                            child: Icon(Icons.add_outlined),
+                            onPressed: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => AddChildScreen()), // Open AddChildScreen
+                            ),
+                            child: const Icon(Icons.add_outlined),
                             backgroundColor: Colors.teal,
                             foregroundColor: Colors.white,
                           ),
                         ],
                       ),
-                    )
+                    ),
                   ],
                 ),
-              )
+              ),
             ],
           ),
         ),

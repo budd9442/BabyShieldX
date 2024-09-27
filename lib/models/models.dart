@@ -14,13 +14,11 @@ class Vaccination {
 
 class Child {
   String name;
-   int age; // Age in months
    String profileImage;
    String gender; // e.g., "baby boy" or "baby girl"
    DateTime dateOfBirth;
    double height; // height in cm
    double weight; // weight in kg
-   Color color;
    List<Vaccination> pastVaccinations;
    DateTime nextVaccinationDate;
   int vaccinationCount;
@@ -29,13 +27,11 @@ class Child {
 
   Child({
     required this.name,
-    required this.age,
     required this.profileImage,
     required this.gender,
     required this.dateOfBirth,
     required this.height,
     required this.weight,
-    required this.color,
     required this.pastVaccinations,
     required this.nextVaccinationDate,
     required this.vaccines,

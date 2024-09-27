@@ -1,8 +1,6 @@
-// Import the ChildDashboard screen
 import 'package:babyshieldx/add_child.dart';
-import 'package:babyshieldx/child_dashboard.dart'; // Assuming you've saved the ChildDashboard as 'child_dashboard.dart'.
+import 'package:babyshieldx/child_dashboard.dart';
 import 'package:babyshieldx/models/child_provider.dart';
-
 import 'package:babyshieldx/models/models.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -13,12 +11,20 @@ class ManageChildrenPage extends StatefulWidget {
 }
 
 class _ManageChildrenPageState extends State<ManageChildrenPage> {
-
+  bool isLoading = true; // New loading state variable
 
   @override
   void initState() {
     super.initState();
+    _fetchChildren(); // Fetch children data on initialization
+  }
 
+  Future<void> _fetchChildren() async {
+    final childrenProvider = Provider.of<ChildrenProvider>(context, listen: false);
+    await childrenProvider.fetchChildren();
+    setState(() {
+      isLoading = false; // Set loading to false after fetching data
+    });
   }
 
   void _viewChildProfile(Child child) {
@@ -31,19 +37,21 @@ class _ManageChildrenPageState extends State<ManageChildrenPage> {
   }
 
   Widget _buildChildCard(Child child) {
+    Color accentColor = child.gender == 'Female'
+        ? Colors.pinkAccent.withAlpha(100)
+        : Colors.lightBlueAccent.withAlpha(100);
     return Container(
       height: 200,
       child: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [child.color, child.color.withOpacity(child.color.opacity/2)],
+            colors: [accentColor, accentColor.withOpacity(accentColor.opacity / 2)],
             begin: Alignment.centerRight,
             end: Alignment.centerLeft,
-
           ),
           borderRadius: BorderRadius.circular(16),
         ),
-        margin: EdgeInsets.fromLTRB(10, 10 , 10, 0),
+        margin: EdgeInsets.fromLTRB(10, 10, 10, 0),
         child: Padding(
           padding: const EdgeInsets.all(20.0),
           child: Row(
@@ -59,7 +67,6 @@ class _ManageChildrenPageState extends State<ManageChildrenPage> {
                 ),
               ),
               SizedBox(width: 10),
-
               Expanded(
                 child: Column(children: [
                   Text(
@@ -68,7 +75,7 @@ class _ManageChildrenPageState extends State<ManageChildrenPage> {
                     maxLines: 1, // Limit to a single line
                   ),
                   Text(
-                    "Age: ${child.age} years",
+                    "Age: ${DateTime.now().year - child.dateOfBirth.year} years",
                     style: TextStyle(fontSize: 14, color: Colors.grey[700]),
                   ),
                   Text(
@@ -100,6 +107,7 @@ class _ManageChildrenPageState extends State<ManageChildrenPage> {
   @override
   Widget build(BuildContext context) {
     final childrenProvider = Provider.of<ChildrenProvider>(context);
+
     return Scaffold(
       backgroundColor: Color(0xFF52C6A9),
       appBar: AppBar(
@@ -109,14 +117,22 @@ class _ManageChildrenPageState extends State<ManageChildrenPage> {
       ),
       body: Container(
         decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(26), topRight: Radius.circular(26))),
-        child:  ListView(
-          children: childrenProvider.children.map((child) => _buildChildCard(child)).toList(),
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(26),
+            topRight: Radius.circular(26),
+          ),
+        ),
+        child: isLoading // Show loading indicator if loading
+            ? Center(child: CircularProgressIndicator())
+            : Consumer<ChildrenProvider>(
+          builder: (context, childrenProvider, child) {
+            return ListView(
+              children: childrenProvider.children.map((child) => _buildChildCard(child)).toList(),
+            );
+          },
         ),
       ),
-
       floatingActionButton: FloatingActionButton(
         onPressed: () => Navigator.push(
           context,

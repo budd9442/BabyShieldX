@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
 class SignInPage extends StatefulWidget {
   @override
   _SignInPageState createState() => _SignInPageState();
@@ -6,7 +8,55 @@ class SignInPage extends StatefulWidget {
 
 class _SignInPageState extends State<SignInPage> {
   final _formKey = GlobalKey<FormState>();
-  bool _obscurePassword = true; // To toggle password visibility
+  bool _obscurePassword = true;
+
+  final _emailController = TextEditingController(text: "test@test.com");
+  final _passwordController = TextEditingController(text: "12121212");
+
+  // Function to handle sign-in
+  void _handleSignIn() async {
+    final email = _emailController.text;
+    final password = _passwordController.text;
+
+    if (_formKey.currentState?.validate() ?? false) {
+      try {
+        final response = await Supabase.instance.client.auth.signInWithPassword(
+          email: email,
+          password: password,
+        );
+
+        if (response.user != null) {
+          // Successful sign-in, navigate to home
+          Navigator.pushNamed(context, '/base');
+        }
+      } on AuthException catch (e) {
+        // Show error message if sign-in fails
+        _showError(e.message);
+      } catch (e) {
+        // General error
+        _showError('An unexpected error occurred');
+      }
+    }
+  }
+
+  // Show error dialog
+  void _showError(String message) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Sign In Failed'),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +68,6 @@ class _SignInPageState extends State<SignInPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Sign In title
               Text(
                 'Sign In',
                 style: TextStyle(
@@ -29,18 +78,19 @@ class _SignInPageState extends State<SignInPage> {
 
               SizedBox(height: 40),
 
-              // Username/Email Input Field
+              // Email Input Field
               TextFormField(
+                controller: _emailController,
                 decoration: InputDecoration(
                   prefixIcon: Icon(Icons.person_outline),
-                  labelText: "Username or Email",
+                  labelText: "Email",
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter your username or email';
+                    return 'Please enter your email';
                   }
                   return null;
                 },
@@ -50,6 +100,7 @@ class _SignInPageState extends State<SignInPage> {
 
               // Password Input Field
               TextFormField(
+                controller: _passwordController,
                 obscureText: _obscurePassword,
                 decoration: InputDecoration(
                   prefixIcon: Icon(Icons.lock_outline),
@@ -78,12 +129,11 @@ class _SignInPageState extends State<SignInPage> {
                 },
               ),
 
-              // Forgot Password Button
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
                   onPressed: () {
-                    // Forgot password functionality
+                    // Forgot password functionality (optional)
                   },
                   child: Text(
                     'Forgot password?',
@@ -98,14 +148,9 @@ class _SignInPageState extends State<SignInPage> {
 
               // Sign In Button
               ElevatedButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, '/home');
-                  // if (_formKey.currentState?.validate() ?? false) {
-                  //   // Perform sign-in action
-                  // }
-                },
+                onPressed: _handleSignIn,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF61C5B1), // Green color
+                  backgroundColor: Color(0xFF61C5B1),
                   padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
@@ -119,7 +164,6 @@ class _SignInPageState extends State<SignInPage> {
 
               SizedBox(height: 20),
 
-              // Social Sign In options
               Text('Or sign in with', style: TextStyle(color: Colors.grey[600])),
 
               SizedBox(height: 10),
@@ -147,7 +191,6 @@ class _SignInPageState extends State<SignInPage> {
 
               SizedBox(height: 20),
 
-              // Sign Up Option
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -155,7 +198,6 @@ class _SignInPageState extends State<SignInPage> {
                   TextButton(
                     onPressed: () {
                       Navigator.pushNamed(context, '/signup');
-                      // Navigate to sign-up page
                     },
                     child: Text(
                       'Sign Up',
