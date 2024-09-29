@@ -56,7 +56,7 @@ class Vaccine {
     required this.name,
     required this.dueInMonths,
     required this.status,
-    this.delayedBy = Duration.zero,
+    this.delayedBy = Duration.zero
   });
 
   int get daysUntilDue {

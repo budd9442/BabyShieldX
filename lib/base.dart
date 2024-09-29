@@ -40,7 +40,9 @@ class _TabBaseState extends State<TabBase> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return PopScope(
+        canPop: false,
+        child: MaterialApp(
       home: Scaffold(
         bottomNavigationBar: menu(),
         body: TabBarView(
@@ -53,16 +55,19 @@ class _TabBaseState extends State<TabBase> with SingleTickerProviderStateMixin {
           ],
         ),
       ),
-    );
+    ));
   }
 
   Widget menu() {
     return Container(
+
       color: Color(0xFF52C6A9),
       child: TabBar(
+        dividerHeight: 0,
         controller: _tabController,
         labelColor: Colors.black87,
         unselectedLabelColor: Colors.white70,
+        padding: EdgeInsets.only(top: 10,bottom: 10),
         tabs: [
           Tab(icon: Icon(Icons.home, size: 45)),
           Tab(icon: Icon(Icons.calendar_month, size: 45)),

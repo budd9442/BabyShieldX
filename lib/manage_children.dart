@@ -4,6 +4,7 @@ import 'package:babyshieldx/models/child_provider.dart';
 import 'package:babyshieldx/models/models.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ManageChildrenPage extends StatefulWidget {
   @override
@@ -27,13 +28,47 @@ class _ManageChildrenPageState extends State<ManageChildrenPage> {
     });
   }
 
+  String getAge(DateTime dateOfBirth) {
+    final now = DateTime.now();
+    final difference = now.difference(dateOfBirth);
+
+    final years = difference.inDays ~/ 365;
+    final months = difference.inDays ~/ 30;
+    final days = difference.inDays;
+
+    if (days < 30) {
+      return "$days days";
+    } else if (months < 12) {
+      return "$months months";
+    } else {
+      return "$years years";
+    }
+  }
+
+
   void _viewChildProfile(Child child) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ChildDashboard(child: child), // Pass the child to ChildDashboard
-      ),
-    );
+    int vaccinesTaken = 0;
+
+    final response = Supabase.instance.client
+        .from('vaccinations')
+        .select('*') // Request the count
+        .eq('child', child.name).count(CountOption.exact);
+
+    response.then((response) {
+      final data = response.data; // The list of vaccinations
+      vaccinesTaken = data.length;
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ChildDashboard(child: child,vaccinesTaken: vaccinesTaken,), // Pass the child to ChildDashboard
+        ),
+      );
+      // Do something with data and count
+    }).catchError((error) {
+      // Handle any errors
+    });
+
   }
 
   Widget _buildChildCard(Child child) {
@@ -75,7 +110,7 @@ class _ManageChildrenPageState extends State<ManageChildrenPage> {
                     maxLines: 1, // Limit to a single line
                   ),
                   Text(
-                    "Age: ${DateTime.now().year - child.dateOfBirth.year} years",
+                    "Age: ${getAge(child.dateOfBirth)} ",
                     style: TextStyle(fontSize: 14, color: Colors.grey[700]),
                   ),
                   Text(

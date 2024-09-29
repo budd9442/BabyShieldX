@@ -1,3 +1,4 @@
+import 'package:babyshieldx/base.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -27,7 +28,13 @@ class _SignInPageState extends State<SignInPage> {
 
         if (response.user != null) {
           // Successful sign-in, navigate to home
-          Navigator.pushNamed(context, '/base');
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+              builder: (context) => TabBase(), // Pass the child object as needed
+            ),
+                (route) => false, // This will remove all previous routes
+          );
         }
       } on AuthException catch (e) {
         // Show error message if sign-in fails

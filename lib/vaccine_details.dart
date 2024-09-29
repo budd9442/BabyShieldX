@@ -98,7 +98,9 @@ class _VaccinePageState extends State<VaccinePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
       appBar: AppBar(
+        backgroundColor: Color(0xFF52C6A9),
         title: Text('Vaccine Information'),
         actions: [
           IconButton(

@@ -1,11 +1,16 @@
 import 'package:babyshieldx/add_child.dart';
+import 'package:babyshieldx/appointments.dart';
 import 'package:babyshieldx/base.dart';
+import 'package:babyshieldx/calendar.dart';
 import 'package:babyshieldx/models/child_provider.dart';
+import 'package:babyshieldx/models/models.dart';
 import 'package:babyshieldx/schedule.dart';
+import 'package:babyshieldx/vaccine_centers.dart';
 import 'package:babyshieldx/vaccine_details.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:intl/intl.dart';
 
 class HomePage extends StatefulWidget {
   final Function(int) changeTab; // Accept the function to switch tabs
@@ -18,6 +23,84 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
+  List<String> nextVaccinationInfo = ['', '', '', '']; // Array to store vaccination info
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchNextVaccination();
+    print(nextVaccinationInfo);
+  }
+
+  Future<void> _fetchNextVaccination() async {
+    try {
+      final supabase = Supabase.instance.client;
+      final vaccinationData = await supabase.from('vaccination_types').select();
+      final childrenProvider = Provider.of<ChildrenProvider>(context, listen: false);
+      List<Child> children = childrenProvider.children;
+
+      List<Event> upcomingVaccinations = [];
+
+      for (var child in children) {
+        for (var vaccine in vaccinationData) {
+          DateTime nextVaccinationDate = _calculateNextVaccinationDate(child.dateOfBirth, vaccine['months'], vaccine['years']);
+
+          if (nextVaccinationDate.isAfter(DateTime.now())) {
+            upcomingVaccinations.add(Event(
+              title: "${child.name}'s ${vaccine['name']}",
+              dateTime: nextVaccinationDate,
+              profileImage: child.profileImage,
+              color: child.gender == 'Female'
+                  ? Colors.pinkAccent.shade100
+                  : Colors.lightBlueAccent.shade100,
+              babyName: child.name,
+              vaccineType: vaccine['name'],
+            ));
+          }
+        }
+      }
+
+      upcomingVaccinations.sort((a, b) => a.dateTime.compareTo(b.dateTime)); // Sort by date
+
+      if (upcomingVaccinations.isNotEmpty) {
+        final nextVaccination = upcomingVaccinations.first;
+
+        setState(() {
+          nextVaccinationInfo[0] = nextVaccination.babyName; // Child's name
+          nextVaccinationInfo[1] = nextVaccination.vaccineType; // Vaccine name
+          nextVaccinationInfo[2] = DateFormat.d().format(nextVaccination.dateTime); // Vaccine date
+          nextVaccinationInfo[3] = DateFormat.MMMM().format(nextVaccination.dateTime); // Vaccine month
+        });
+      }
+    } catch (e) {
+      print('An error occurred: $e');
+    }
+  }
+
+  DateTime _calculateNextVaccinationDate(DateTime birthDate, int months, int years) {
+    return DateTime(birthDate.year + years, birthDate.month + months, birthDate.day);
+  }
+
+  String _getDateSuffix(int day) {
+    if (day >= 11 && day <= 13) {
+      return 'th';
+    }
+    switch (day % 10) {
+      case 1:
+        return 'st';
+      case 2:
+        return 'nd';
+      case 3:
+        return 'rd';
+      default:
+        return 'th';
+    }
+  }
+
+
+
+
+
 
   Future<void> _handleSignOut() async {
     // Sign out the user
@@ -154,7 +237,12 @@ class _HomePageState extends State<HomePage> {
               ),
               trailing: const Icon(Icons.arrow_forward_ios_outlined),
               onTap: () {
-                // Navigate to Doctor Channeling
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MakeAppointmentPage()
+                  ),
+                );
               },
             ),
             const SizedBox(height: 10),
@@ -168,7 +256,12 @@ class _HomePageState extends State<HomePage> {
               ),
               trailing: const Icon(Icons.arrow_forward_ios_outlined),
               onTap: () {
-                // Navigate to Vaccine Centers
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => VaccineCenterPage(imagePath: ''), // Pass the child to ChildDashboard
+                  ),
+                );
               },
             ),
             const SizedBox(height: 10),
@@ -281,36 +374,37 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               ],
                             ),
-                            const Flexible(
+                            Flexible(
                               child: Column(
                                 children: [
-                                  SizedBox(
+                                  const SizedBox(
                                     width: 20,
                                   ),
                                   Column(
                                     children: [
-                                      SizedBox(
-                                        height: 30,
+                                      const SizedBox(
+
+                                    height: 30,
                                       ),
                                       Text(
-                                        '03ʳᵈ',
-                                        style: TextStyle(
+                                           "3ʳᵈ" ,
+                                        style: const TextStyle(
                                             fontSize: 32,
                                             fontWeight: FontWeight.bold,
                                             color: Colors.white),
                                       ),
                                       Text(
-                                        'January',
-                                        style: TextStyle(
+                                        "April",
+                                        style: const TextStyle(
                                             fontSize: 24,
                                             fontWeight: FontWeight.bold,
                                             color: Colors.white),
                                       ),
-                                      SizedBox(
+                                      const SizedBox(
                                         height: 20,
                                       ),
-                                      Text(
-                                        'Mary Jane\nDTP-Hib-HepB',
+                                      const Text(
+                                        'Cheyana\nMMR Vaccine',
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
                                             fontSize: 16, color: Colors.white),
@@ -325,6 +419,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     // Quick response card
+                    SizedBox(height: 10,),
                     Card(
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15.0),
@@ -336,7 +431,9 @@ class _HomePageState extends State<HomePage> {
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
+
                                 children: [
+
                                   const Text(
                                     textAlign: TextAlign.center,
                                     'You can explore our full medical services through our official website. This app is helpful for getting an appointment with your doctor.',
@@ -367,8 +464,9 @@ class _HomePageState extends State<HomePage> {
                     ),
                     const SizedBox(height: 32),
                     // Bottom buttons
+
                     Container(
-                      margin: const EdgeInsets.only(bottom: 110),
+                      margin: EdgeInsets.only(bottom: 100),
                       child: Flex(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         direction: Axis.horizontal,

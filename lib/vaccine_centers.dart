@@ -1,29 +1,37 @@
 import 'package:flutter/material.dart';
 
-class FullScreenPhotoPage extends StatelessWidget {
+class VaccineCenterPage extends StatelessWidget {
   final String imagePath;
 
-  const FullScreenPhotoPage({Key? key, required this.imagePath}) : super(key: key);
+  const VaccineCenterPage({Key? key, required this.imagePath})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF52C6A9),
-      appBar: AppBar(
-        backgroundColor: Color(0xFF52C6A9),
-        title: Text("Growth Details", style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold,),),
-      ),
-      body: Column(
+      body: Stack(
         children: [
-          Image.asset(
-            "assets/weightChart.png",
-            fit: BoxFit.contain, // Ensures the image covers the entire screen
+          // Full screen local image
+          Positioned.fill(
+            child: Image.asset(
+              "assets/vaccineCenters.png",
+              fit: BoxFit.cover, // Ensures the image covers the entire screen
+            ),
           ),
-          Expanded(child: Container(
-            color: Colors.white,
-          ))
+          // Back button
+          SafeArea(
+            child: Align(
+              alignment: Alignment.topLeft,
+              child: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.black),
+                onPressed: () {
+                  Navigator.of(context).pop(); // Navigate back
+                },
+              ),
+            ),
+          ),
         ],
-      )
+      ),
     );
   }
 }

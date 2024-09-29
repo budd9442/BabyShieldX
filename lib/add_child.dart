@@ -122,6 +122,7 @@ class _AddChildScreenState extends State<AddChildScreen> {
     final childrenProvider = Provider.of<ChildrenProvider>(context);
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
         appBar: AppBar(
           backgroundColor: Color(0xFF52C6A9),
           title: Text("Add Child Details"),
@@ -132,12 +133,7 @@ class _AddChildScreenState extends State<AddChildScreen> {
             },
           ),
           actions: [
-            IconButton(
-                onPressed: _scanQrCode,
-                icon: Icon(
-                  Icons.qr_code,
-                  size: 32,
-                )),
+
             SizedBox(
               width: 10,
             ),

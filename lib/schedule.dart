@@ -101,11 +101,18 @@ class _VaccineSchedulePageState extends State<VaccineSchedulePage> {
                   .eq('child', _currentChild.name)
                   .single();
 
+              DateTime vacDate = DateTime.parse(vaccinationResponse['vac_date']);
+              int delayInDays = vacDate.difference(nextVacDay).inDays;
+
+              VaccineStatus status = delayInDays > 7
+                  ? VaccineStatus.delayed
+                  : VaccineStatus.completed;
+
               vaccines.add(Vaccine(
                 name: vaccineName,
-                status: VaccineStatus.completed,
+                status: status,
                 dueInMonths: months + 12 * years,
-                delayedBy: Duration.zero,
+                delayedBy: Duration(days: delayInDays),
               ));
             } catch (e) {
               vaccines.add(Vaccine(
@@ -148,7 +155,7 @@ class _VaccineSchedulePageState extends State<VaccineSchedulePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Vaccine Schedule'),
+        title: Text('Vaccine Schedule',style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold,),),
         backgroundColor: Color(0xFF52C6A9),
       ),
       body: _isLoading // Show loading animation when fetching data

@@ -1,18 +1,28 @@
 import 'package:babyshieldx/models/child_provider.dart';
 import 'package:babyshieldx/schedule.dart';
+import 'package:babyshieldx/weightChart.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:mobile_scanner/mobile_scanner.dart'; // Import the mobile scanner package
+import 'package:qr_flutter/qr_flutter.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'models/models.dart'; // Assuming models.dart contains the Child class
 
 class ChildDashboard extends StatelessWidget {
   final Child child;
+  final int vaccinesTaken;
 
-  ChildDashboard({required this.child});
+  ChildDashboard({
+    required this.child,
+    required this.vaccinesTaken,
+  });
 
   @override
   Widget build(BuildContext context) {
     final childrenProvider = Provider.of<ChildrenProvider>(context);
+    print(vaccinesTaken);
+
+    int count = 0;
 
     return Stack(
       alignment: Alignment.topLeft,
@@ -31,8 +41,8 @@ class ChildDashboard extends StatelessWidget {
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16)),
                   color: child.gender == 'Female'
-                      ? Colors.pinkAccent.withAlpha(100)
-                      : Colors.lightBlueAccent.withAlpha(100),
+                      ? Colors.pinkAccent.withAlpha(180)
+                      : Colors.blueAccent.withAlpha(180),
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Row(
@@ -55,7 +65,7 @@ class ChildDashboard extends StatelessWidget {
                               ),
                               SizedBox(height: 4),
                               Text(
-                                "${DateTime.now().year - child.dateOfBirth.year} years old",
+                                getAge(child.dateOfBirth) + " old",
                                 style: TextStyle(
                                     fontSize: 16, color: Colors.black54),
                               ),
@@ -69,9 +79,17 @@ class ChildDashboard extends StatelessWidget {
                           ),
                         ),
                         IconButton(
-                          icon: Icon(Icons.qr_code, color: Colors.black54, size: 36),
+                          icon: Icon(Icons.qr_code_scanner_rounded,
+                              color: Colors.black54, size: 56),
                           onPressed: () {
-                            _scanQRCode(context); // Call the QR code scanner
+                            // _scanQRCode(context); // Call the QR code scanner
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    QRCodeOverlay(childName: child.name),
+                              ),
+                            );
                           },
                         ),
                       ],
@@ -133,8 +151,10 @@ class ChildDashboard extends StatelessWidget {
                             context,
                             MaterialPageRoute(
                               builder: (context) => VaccineSchedulePage(
-                                children: childrenProvider.children, // Pass the relevant child or children
-                                initialIndex: 0, // If needed, you can set an initial index
+                                children: childrenProvider.children,
+                                // Pass the relevant child or children
+                                initialIndex:
+                                    0, // If needed, you can set an initial index
                               ),
                             ),
                           );
@@ -143,7 +163,12 @@ class ChildDashboard extends StatelessWidget {
                         icon: Icons.bar_chart,
                         title: "Growth Details",
                         onTap: () {
-                          // Handle Growth Details tap
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => FullScreenPhotoPage(imagePath: 'assets/weightChart.png',), // Pass the child to ChildDashboard
+                            ),
+                          );
                         }),
                     _buildDashboardOption(
                         icon: Icons.vaccines,
@@ -179,21 +204,21 @@ class ChildDashboard extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              "${child.vaccinationCount} doses vaccinated",
+                              "${vaccinesTaken} doses vaccinated",
                               style: TextStyle(color: Colors.black54),
                             ),
                             Text(
-                              "${child.vaccinationProgress}% completed",
+                              "${(vaccinesTaken / 12 * 100).toStringAsFixed(0)}% completed",
                               style: TextStyle(color: Colors.black54),
                             ),
                           ],
                         ),
                         SizedBox(height: 8),
                         LinearProgressIndicator(
-                          value: child.vaccinationProgress / 100,
+                          value: vaccinesTaken / 12,
                           backgroundColor: Colors.grey.shade300,
                           valueColor:
-                          AlwaysStoppedAnimation<Color>(Colors.green),
+                              AlwaysStoppedAnimation<Color>(Colors.green),
                         ),
                       ],
                     ),
@@ -234,33 +259,64 @@ class ChildDashboard extends StatelessWidget {
   }
 
   // Function to open the QR Code scanner
-  void _scanQRCode(BuildContext context) async {
-    final String? scannedCode = await Navigator.push(
+  // Function to open the QR Code scanner and push the data to Supabase
+
+  void _showQRCodeOverlay(BuildContext context) {
+    Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => QRCodeScanner(),
+        builder: (context) => QRCodeOverlay(childName: child.name),
       ),
     );
-
-    if (scannedCode != null) {
-      // Do something with the scanned code
-      print('Scanned QR Code: $scannedCode');
-      // For example, you could show a dialog with the scanned code
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('Scanned QR Code'),
-          content: Text(scannedCode),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text('OK'),
-            ),
-          ],
-        ),
-      );
-    }
   }
+
+  // void _scanQRCode(BuildContext context) async {
+  //   final String? scannedCode = await Navigator.push(
+  //     context,
+  //     MaterialPageRoute(
+  //       builder: (context) => QRCodeScanner(),
+  //     ),
+  //   );
+  //
+  //   if (scannedCode != null) {
+  //     // Push data to Supabase
+  //     await _saveVaccinationToSupabase(scannedCode, child.name);
+  //
+  //     // Show a confirmation dialog
+  //     showDialog(
+  //       context: context,
+  //       builder: (context) => AlertDialog(
+  //         title: Text('Scanned QR Code'),
+  //         content: Text('Vaccination for ${child.name} saved: $scannedCode'),
+  //         actions: [
+  //           TextButton(
+  //             onPressed: () => Navigator.pop(context),
+  //             child: Text('OK'),
+  //           ),
+  //         ],
+  //       ),
+  //     );
+  //   }
+  // }
+  //
+  // // Function to save the scanned QR code and child's name to Supabase
+  // Future<void> _saveVaccinationToSupabase(String qrCode, String childName) async {
+  //   final supabase = Supabase.instance.client;
+  //
+  //   // Assuming the 'vaccinations' table has columns: vac_id, child, and date
+  //   final response = await supabase.from('vaccinations').insert({
+  //     'vac_id': qrCode,  // QR Code scanned
+  //     'child': childName, // Child's name
+  //     'vac_date': DateTime.now().toIso8601String(), // Current date
+  //   });
+  //
+  //   if (response.error != null) {
+  //     // Handle error
+  //     print('Error saving vaccination: ${response.error!.message}');
+  //   } else {
+  //     print('Vaccination saved successfully');
+  //   }
+  // }
 
   Widget _buildDashboardOption({
     required IconData icon,
@@ -268,8 +324,8 @@ class ChildDashboard extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     Color accentColor = child.gender == 'Female'
-        ? Colors.pinkAccent.withAlpha(100)
-        : Colors.lightBlueAccent.withAlpha(100);
+        ? Colors.pinkAccent.withAlpha(180)
+        : Colors.blueAccent.withAlpha(180);
     return GestureDetector(
       onTap: onTap,
       child: Card(
@@ -278,7 +334,10 @@ class ChildDashboard extends StatelessWidget {
           padding: EdgeInsets.all(16),
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [Color.lerp(Colors.white, accentColor, 0.6)!, accentColor],
+              colors: [
+                Color.lerp(Colors.white, accentColor, 0.6)!,
+                accentColor
+              ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -303,6 +362,23 @@ class ChildDashboard extends StatelessWidget {
   }
 }
 
+String getAge(DateTime dateOfBirth) {
+  final now = DateTime.now();
+  final difference = now.difference(dateOfBirth);
+
+  final years = difference.inDays ~/ 365;
+  final months = difference.inDays ~/ 30;
+  final days = difference.inDays;
+
+  if (days < 30) {
+    return "$days days";
+  } else if (months < 12) {
+    return "$months months";
+  } else {
+    return "$years years";
+  }
+}
+
 // QR Code Scanner Page
 class QRCodeScanner extends StatefulWidget {
   @override
@@ -316,7 +392,7 @@ class _QRCodeScannerState extends State<QRCodeScanner> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("QR Code Scanner"),
+        title: Text("Please scan he QR Code"),
         actions: [
           IconButton(
             icon: Icon(Icons.flash_on),
@@ -335,6 +411,84 @@ class _QRCodeScannerState extends State<QRCodeScanner> {
             }
           }
         },
+      ),
+    );
+  }
+}
+
+class QRCodeOverlay extends StatelessWidget {
+  final String childName;
+
+  QRCodeOverlay({required this.childName});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("QR Code for $childName"),
+      ),
+      backgroundColor: Color(0xFF52C6A9), // Match background color
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Upper QR Code section
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(
+                color: Color(0xFF52C6A9),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(30),
+                  topRight: Radius.circular(30),
+                ),
+              ),
+              child: Center(
+                child: QrImageView(
+                  data: childName,
+                  version: QrVersions.auto,
+                  size: 250.0,
+                ),
+              ),
+            ),
+          ),
+
+          // Lower rounded section
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.symmetric(vertical: 40, horizontal: 20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(40),
+                topRight: Radius.circular(40),
+              ),
+            ),
+            child: Column(
+              children: [
+                CircularProgressIndicator(
+                  color: Colors.teal, // Matching the spinner color
+                ),
+                SizedBox(height: 20),
+                Text(
+                  "Waiting for Doctor update",
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.teal,
+                  ),
+                ),
+                SizedBox(height: 10),
+                Text(
+                  "Please ask your doctor to scan this in order to update your vaccination records",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
